@@ -21,6 +21,11 @@ def cafe_worker(order: str) -> OrderReplies:
     return OrderReplies.confirmation if order in ['cookies', 'samosa'] else OrderReplies.unavailability
 
 
+def run():
+    order = input("What will be the order: ")
+    return cafe_worker(order)
+
+
 def test_cafe_worker():
     assert cafe_worker('cookie') == OrderReplies.unavailability, 'cookie Failed'
     assert cafe_worker('cookies') == OrderReplies.confirmation, 'cookies Failed'
@@ -40,3 +45,7 @@ class TestCafeWorker(unittest.TestCase):
         self.assertEqual(cafe_worker(''), OrderReplies.unavailability, 'EmptyString test Failed')
         self.assertEqual(cafe_worker('cookie'), OrderReplies.unavailability, 'Wrong word test Failed')
         self.assertEqual(cafe_worker('samosas'), OrderReplies.unavailability, 'Wrong word test Failed')
+
+
+if __name__ == '__main__':
+    run()
