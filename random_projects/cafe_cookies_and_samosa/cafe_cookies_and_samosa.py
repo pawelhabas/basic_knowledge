@@ -18,12 +18,13 @@ class OrderReplies(Enum):
 
 
 def cafe_worker(order: str) -> OrderReplies:
-    return OrderReplies.confirmation if order in ['cookies', 'samosa'] else OrderReplies.unavailability
+    return OrderReplies.confirmation if order.strip().lower() in ['cookies', 'samosa'] else OrderReplies.unavailability
 
 
 def run():
     order = input("What will be the order: ")
-    return cafe_worker(order)
+    answer = cafe_worker(order).value
+    return print(answer)
 
 
 def test_cafe_worker():

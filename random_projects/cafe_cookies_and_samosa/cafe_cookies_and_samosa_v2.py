@@ -18,42 +18,46 @@ class OrderReplies(Enum):
     unavailability = 'Product unavailable'
 
 
-def cafe_worker() -> OrderReplies:
+def cafe_worker() -> str:
     order = input("What will be the order: ")
-    return OrderReplies.confirmation if order in ['cookies', 'samosa'] else OrderReplies.unavailability
+    return OrderReplies.confirmation.value if order.strip().lower() in ['cookies', 'samosa'] else OrderReplies.unavailability.value
 
 
 def test_cafe_worker(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda _: "cookies")
-    assert cafe_worker() == OrderReplies.confirmation, 'cookies Failed'
+    assert cafe_worker() == OrderReplies.confirmation.value, 'cookies Failed'
 
     monkeypatch.setattr("builtins.input", lambda _: "samosa")
-    assert cafe_worker() == OrderReplies.confirmation, 'samosa Failed'
+    assert cafe_worker() == OrderReplies.confirmation.value, 'samosa Failed'
 
     monkeypatch.setattr("builtins.input", lambda _: "cookie")
-    assert cafe_worker() == OrderReplies.unavailability, 'cookie Failed'
+    assert cafe_worker() == OrderReplies.unavailability.value, 'cookie Failed'
 
     monkeypatch.setattr("builtins.input", lambda _: "")
-    assert cafe_worker() == OrderReplies.unavailability, 'EmptyString Failed'
+    assert cafe_worker() == OrderReplies.unavailability.value, 'EmptyString Failed'
 
 
 class TestCafeWorker(unittest.TestCase):
     @patch("builtins.input", return_value="cookies")
     def test_cafe_worker_confirmation_cookies(self, mock_snack):
-        self.assertEqual(cafe_worker(), OrderReplies.confirmation, '"cookies" test Failed')
+        self.assertEqual(cafe_worker(), OrderReplies.confirmation.value, '"cookies" test Failed')
 
     @patch("builtins.input", return_value="samosa")
     def test_cafe_worker_confirmation_samosa(self, mock_snack):
-        self.assertEqual(cafe_worker(), OrderReplies.confirmation, '"samosa" test Failed')
+        self.assertEqual(cafe_worker(), OrderReplies.confirmation.value, '"samosa" test Failed')
 
     @patch("builtins.input", return_value="")
     def test_cafe_worker_unavailability_empty_string(self, mock_snack):
-        self.assertEqual(cafe_worker(), OrderReplies.unavailability, 'EmptyString test Failed')
+        self.assertEqual(cafe_worker(), OrderReplies.unavailability.value, 'EmptyString test Failed')
 
     @patch("builtins.input", return_value="cookie")
     def test_cafe_worker_unavailability_wrong_word_cookie(self, mock_snack):
-        self.assertEqual(cafe_worker(), OrderReplies.unavailability, 'Wrong word test Failed')
+        self.assertEqual(cafe_worker(), OrderReplies.unavailability.value, 'Wrong word test Failed')
 
     @patch("builtins.input", return_value="samosas")
     def test_cafe_worker_unavailability_wrong_word_samosas(self, mock_snack):
-        self.assertEqual(cafe_worker(), OrderReplies.unavailability, 'Wrong word test Failed')
+        self.assertEqual(cafe_worker(), OrderReplies.unavailability.value, 'Wrong word test Failed')
+
+
+if __name__ == '__main__':
+    print(cafe_worker())
