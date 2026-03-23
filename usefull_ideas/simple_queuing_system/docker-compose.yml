@@ -1,0 +1,71 @@
+services:
+  postgres_db:
+    image: postgres:15
+    container_name: postgres_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - my_network
+
+  django:
+    build:
+      context: ./django
+      dockerfile: Dockerfile
+    container_name: django
+    depends_on:
+      - postgres_db
+    environment:
+      - CELERY_BROKER_URL=amqp://${RABBIT_USER}:${RABBIT_PASS}@rabbitmq:5672//
+    expose:
+      - "8000"
+    restart: unless-stopped
+    networks:
+      - my_network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASS}
+    networks:
+      - my_network
+
+  celery_worker:
+    build:
+      context: ./django
+      dockerfile: Dockerfile
+    container_name: celery-worker
+    restart: always
+    environment:
+      - CELERY_BROKER_URL=amqp://${RABBIT_USER}:${RABBIT_PASS}@rabbitmq:5672//
+    entrypoint: [ ] # Clear default start script
+    command: celery -A my_project worker --loglevel=info
+    depends_on:
+      - rabbitmq
+      - postgres_db
+    networks:
+      - my_network
+
+  celery-beat:
+    build: ./django
+    container_name: celery-beat
+    entrypoint: [ ] # Clear default start script
+    command: celery -A my_project beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    depends_on:
+      - rabbitmq
+      - postgres_db
+    restart: always
+    networks:
+      - my_network
+
+networks:
+  my_network:
+
+volumes:
+  postgres_data:
